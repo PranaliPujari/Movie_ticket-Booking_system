@@ -1,6 +1,6 @@
 # CineNova Movie Ticket Booking System
 
-CineNova is a browser-based movie ticket booking application built with HTML, CSS, and vanilla JavaScript. Users can browse movies, filter by genre, view movie details, choose a theatre and show time, select seats, and receive a booking confirmation. Administrators can manage movies, theatres, and bookings from the admin dashboard.
+CineNova is a browser-based movie ticket booking application built with HTML, CSS, and JavaScript. Users can browse movies, filter by genre, view movie details, choose a theatre and show time, select seats, and receive a booking confirmation. Administrators can manage movies, theatres, and bookings from the admin dashboard.
 
 ## Features
 
