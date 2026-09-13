@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineNova | Select Seats</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar scrolled">
+    <div class="container">
+      <a href="index.html" class="logo"><div class="logo-icon">🎬</div>Cine<span>Nova</span></a>
+      <div style="text-align:center;">
+        <div style="font-weight:700; font-size:1rem;" id="seat-movie-title">—</div>
+        <div style="font-size:0.8rem; color:var(--text-dim);" id="seat-info">—</div>
+      </div>
+      <a href="index.html" class="btn btn-ghost btn-sm">← Back</a>
+    </div>
+  </nav>
+
+  <div class="seat-page">
+    <div class="container">
+      <!-- Screen -->
+      <div class="screen-wrap">
+        <div class="screen-3d"></div>
+        <div class="screen-label">All Eyes This Way — Screen</div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--surface-3);"></div>Available</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--primary); box-shadow:0 0 10px var(--primary-glow);"></div>Selected</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--surface-2); opacity:0.5;"></div>Booked</div>
+      </div>
+
+      <!-- Seats -->
+      <div class="seating-area" id="seating-area"></div>
+    </div>
+  </div>
+
+  <!-- Booking Bar -->
+  <div class="booking-bar">
+    <div class="container booking-bar-inner">
+      <div class="booking-bar-info">
+        <div>
+          <div class="bar-label">Selected Seats</div>
+          <div class="bar-value" id="selected-seats-display">None</div>
+        </div>
+        <div>
+          <div class="bar-label">Tickets</div>
+          <div class="bar-value" id="seat-count">0</div>
+        </div>
+        <div>
+          <div class="bar-label">Total</div>
+          <div class="bar-price" id="total-price">₹0</div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-lg" id="continue-btn" disabled style="opacity:0.5;">
+        Continue to Summary →
+      </button>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    const booking = JSON.parse(sessionStorage.getItem('currentBooking'));
+    if (!booking) { window.location.href = 'index.html'; }
+
+    const movies = JSON.parse(localStorage.getItem('movies'));
+    const theatres = JSON.parse(localStorage.getItem('theatres'));
+    const seatMaps = JSON.parse(localStorage.getItem('seatMaps')) || {};
+    const movie = movies.find(m => m.id === booking.movieId);
+    const theatre = theatres.find(t => t.id === booking.theatreId);
+
+    document.getElementById('seat-movie-title').textContent = movie.title;
+    document.getElementById('seat-info').textContent = `${theatre.name} · ${booking.date} · ${booking.time}`;
+
+    const showKey = `${booking.movieId}_${booking.theatreId}_${booking.date}_${booking.time}`;
+    const bookedSeats = seatMaps[showKey] || [];
+
+    const PRICE = 250;
+    const ROWS = ['A','B','C','D','E','F','G','H'];
+    const COLS = 10;
+    let selectedSeats = [];
+
+    const area = document.getElementById('seating-area');
+    ROWS.forEach(row => {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'seat-row';
+
+      // Row label
+      const label = document.createElement('span');
+      label.className = 'row-label';
+      label.textContent = row;
+      rowDiv.appendChild(label);
+
+      for (let c = 1; c <= COLS; c++) {
+        if (c === 6) {
+          const aisle = document.createElement('div');
+          aisle.className = 'seat-aisle';
+          rowDiv.appendChild(aisle);
+        }
+        const seatId = `${row}${c}`;
+        const btn = document.createElement('button');
+        btn.className = 'seat ' + (bookedSeats.includes(seatId) ? 'booked' : 'available');
+        btn.title = seatId;
+        btn.disabled = bookedSeats.includes(seatId);
+        btn.addEventListener('click', () => {
+          if (btn.classList.contains('selected')) {
+            btn.classList.replace('selected', 'available');
+            selectedSeats = selectedSeats.filter(s => s !== seatId);
+          } else {
+            btn.classList.replace('available', 'selected');
+            selectedSeats.push(seatId);
+          }
+          updateBar();
+        });
+        rowDiv.appendChild(btn);
+      }
+
+      // Row label end
+      const label2 = document.createElement('span');
+      label2.className = 'row-label';
+      label2.textContent = row;
+      rowDiv.appendChild(label2);
+
+      area.appendChild(rowDiv);
+    });
+
+    function updateBar() {
+      const count = selectedSeats.length;
+      document.getElementById('seat-count').textContent = count;
+      document.getElementById('total-price').textContent = `₹${count * PRICE}`;
+      document.getElementById('selected-seats-display').textContent = count ? selectedSeats.join(', ') : 'None';
+      const btn = document.getElementById('continue-btn');
+      btn.disabled = count === 0;
+      btn.style.opacity = count ? '1' : '0.5';
+    }
+
+    document.getElementById('continue-btn').addEventListener('click', () => {
+      booking.seats = selectedSeats;
+      booking.totalAmount = selectedSeats.length * PRICE;
+      sessionStorage.setItem('currentBooking', JSON.stringify(booking));
+      window.location.href = 'booking-summary.html';
+    });
+  </script>
+</body>
+</html>

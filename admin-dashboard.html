@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineNova | Admin Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar scrolled">
+    <div class="container">
+      <a href="index.html" class="logo"><div class="logo-icon">🎬</div>Cine<span>Nova</span></a>
+      <div style="color:var(--primary); font-weight:700; font-size:0.85rem; background:rgba(229,9,20,0.1); padding:4px 12px; border-radius:20px; border:1px solid rgba(229,9,20,0.3);">⚡ Admin Panel</div>
+      <button onclick="logout()" class="btn btn-ghost btn-sm">Logout</button>
+    </div>
+  </nav>
+
+  <div class="admin-page">
+    <div class="container admin-layout">
+      <!-- Sidebar -->
+      <aside class="admin-sidebar">
+        <h3>Navigation</h3>
+        <button class="sidebar-btn active" id="btn-movies">🎬 Manage Movies</button>
+        <button class="sidebar-btn" id="btn-bookings">📋 All Bookings</button>
+        <button class="sidebar-btn" id="btn-theatres">🏟 Theatres</button>
+      </aside>
+
+      <!-- Content -->
+      <div class="admin-content">
+        <!-- MOVIES -->
+        <div id="section-movies">
+          <div class="admin-content-header">
+            <h2>🎬 Manage Movies</h2>
+            <button class="btn btn-primary btn-sm" id="add-movie-btn">+ Add Movie</button>
+          </div>
+          <table>
+            <thead><tr><th>ID</th><th>Title</th><th>Language</th><th>Status</th><th>Rating</th><th>Actions</th></tr></thead>
+            <tbody id="movies-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- BOOKINGS -->
+        <div id="section-bookings" style="display:none;">
+          <div class="admin-content-header"><h2>📋 All Bookings</h2></div>
+          <table>
+            <thead><tr><th>Booking ID</th><th>User</th><th>Movie</th><th>Date</th><th>Seats</th><th>Amount</th></tr></thead>
+            <tbody id="bookings-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- THEATRES -->
+        <div id="section-theatres" style="display:none;">
+          <div class="admin-content-header"><h2>🏟 Theatres</h2></div>
+          <table>
+            <thead><tr><th>ID</th><th>Name</th><th>Location</th></tr></thead>
+            <tbody id="theatres-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Movie Modal -->
+  <div class="modal-overlay" id="movie-modal">
+    <div class="modal-box">
+      <h3 id="modal-title">Add Movie</h3>
+      <form id="movie-form">
+        <input type="hidden" id="m-id">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group" style="grid-column:span 2;">
+            <label>Title</label><input type="text" id="m-title" required>
+          </div>
+          <div class="form-group">
+            <label>Genre</label><input type="text" id="m-genre" required placeholder="Action, Drama">
+          </div>
+          <div class="form-group">
+            <label>Duration</label><input type="text" id="m-duration" required placeholder="2h 30m">
+          </div>
+          <div class="form-group">
+            <label>Language</label><input type="text" id="m-lang" required>
+          </div>
+          <div class="form-group">
+            <label>Rating</label><input type="number" id="m-rating" min="0" max="10" step="0.1" required>
+          </div>
+          <div class="form-group" style="grid-column:span 2;">
+            <label>Poster URL</label><input type="url" id="m-poster" required>
+          </div>
+          <div class="form-group" style="grid-column:span 2;">
+            <label>Banner URL</label><input type="url" id="m-banner" required>
+          </div>
+          <div class="form-group" style="grid-column:span 2;">
+            <label>Synopsis</label><input type="text" id="m-synopsis">
+          </div>
+          <div class="form-group" style="grid-column:span 2;">
+            <label>Cast</label><input type="text" id="m-cast">
+          </div>
+          <div class="form-group" style="grid-column:span 2;">
+            <label>Status</label>
+            <select id="m-status">
+              <option value="now_showing">Now Showing</option>
+              <option value="upcoming">Upcoming</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="close-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Movie</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    function logout() { localStorage.removeItem('currentUser'); window.location.href = 'index.html'; }
+    const cu = JSON.parse(localStorage.getItem('currentUser'));
+    if (!cu || cu.role !== 'admin') { window.location.href = 'index.html'; }
+
+    // Tab switching
+    const sections = { movies: 'section-movies', bookings: 'section-bookings', theatres: 'section-theatres' };
+    ['movies','bookings','theatres'].forEach(tab => {
+      document.getElementById(`btn-${tab}`).addEventListener('click', () => {
+        Object.values(sections).forEach(s => document.getElementById(s).style.display = 'none');
+        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(sections[tab]).style.display = 'block';
+        document.getElementById(`btn-${tab}`).classList.add('active');
+        if (tab === 'bookings') renderBookings();
+        if (tab === 'theatres') renderTheatres();
+        if (tab === 'movies') renderMoviesTable();
+      });
+    });
+
+    function renderMoviesTable() {
+      const movies = JSON.parse(localStorage.getItem('movies')) || [];
+      document.getElementById('movies-tbody').innerHTML = movies.map(m => `
+        <tr>
+          <td style="color:var(--text-faint); font-size:0.8rem;">${m.id}</td>
+          <td style="font-weight:600;">${m.title}</td>
+          <td>${m.language}</td>
+          <td><span style="padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; background:${m.status==='now_showing'?'rgba(229,9,20,0.15)':'rgba(251,191,36,0.15)'}; color:${m.status==='now_showing'?'#e50914':'#fbbf24'};">${m.status === 'now_showing' ? '● Live' : 'Soon'}</span></td>
+          <td>⭐ ${m.rating}</td>
+          <td>
+            <button class="tbl-action tbl-edit" onclick="editMovie('${m.id}')">Edit</button>
+            <button class="tbl-action tbl-delete" onclick="deleteMovie('${m.id}')">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderBookings() {
+      const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+      const movies = JSON.parse(localStorage.getItem('movies')) || [];
+      document.getElementById('bookings-tbody').innerHTML = bookings.length
+        ? bookings.map(b => {
+            const movie = movies.find(m => m.id === b.movieId);
+            return `<tr>
+              <td style="font-family:monospace; color:var(--primary);">${b.bookingId}</td>
+              <td>${b.userEmail}</td>
+              <td style="font-weight:600;">${movie ? movie.title : b.movieId}</td>
+              <td>${b.date}</td>
+              <td style="color:var(--text-dim);">${b.seats ? b.seats.join(', ') : '—'}</td>
+              <td style="font-weight:700; color:var(--gold);">₹${b.totalAmount ? b.totalAmount.toLocaleString('en-IN') : 0}</td>
+            </tr>`;
+          }).join('')
+        : `<tr><td colspan="6" style="text-align:center; color:var(--text-faint); padding:40px;">No bookings yet.</td></tr>`;
+    }
+
+    function renderTheatres() {
+      const theatres = JSON.parse(localStorage.getItem('theatres')) || [];
+      document.getElementById('theatres-tbody').innerHTML = theatres.map(t => `
+        <tr>
+          <td style="color:var(--text-faint); font-size:0.8rem;">${t.id}</td>
+          <td style="font-weight:600;">${t.name}</td>
+          <td style="color:var(--text-dim);">${t.location}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Initial render
+    renderMoviesTable();
+
+    // Modal
+    const modal = document.getElementById('movie-modal');
+    document.getElementById('add-movie-btn').addEventListener('click', () => {
+      document.getElementById('modal-title').textContent = '+ Add Movie';
+      document.getElementById('movie-form').reset();
+      document.getElementById('m-id').value = '';
+      modal.classList.add('active');
+    });
+    document.getElementById('close-modal').addEventListener('click', () => modal.classList.remove('active'));
+
+    window.editMovie = id => {
+      const movies = JSON.parse(localStorage.getItem('movies'));
+      const m = movies.find(x => x.id === id);
+      if (!m) return;
+      document.getElementById('modal-title').textContent = 'Edit Movie';
+      document.getElementById('m-id').value = m.id;
+      document.getElementById('m-title').value = m.title;
+      document.getElementById('m-genre').value = m.genre;
+      document.getElementById('m-duration').value = m.duration;
+      document.getElementById('m-lang').value = m.language;
+      document.getElementById('m-rating').value = m.rating;
+      document.getElementById('m-poster').value = m.poster;
+      document.getElementById('m-banner').value = m.banner;
+      document.getElementById('m-synopsis').value = m.synopsis || '';
+      document.getElementById('m-cast').value = m.cast || '';
+      document.getElementById('m-status').value = m.status;
+      modal.classList.add('active');
+    };
+
+    window.deleteMovie = id => {
+      if (!confirm('Delete this movie?')) return;
+      let movies = JSON.parse(localStorage.getItem('movies'));
+      movies = movies.filter(m => m.id !== id);
+      localStorage.setItem('movies', JSON.stringify(movies));
+      renderMoviesTable();
+    };
+
+    document.getElementById('movie-form').addEventListener('submit', e => {
+      e.preventDefault();
+      let movies = JSON.parse(localStorage.getItem('movies')) || [];
+      const id = document.getElementById('m-id').value;
+      const data = {
+        title: document.getElementById('m-title').value,
+        genre: document.getElementById('m-genre').value,
+        duration: document.getElementById('m-duration').value,
+        language: document.getElementById('m-lang').value,
+        rating: document.getElementById('m-rating').value,
+        poster: document.getElementById('m-poster').value,
+        banner: document.getElementById('m-banner').value,
+        synopsis: document.getElementById('m-synopsis').value,
+        cast: document.getElementById('m-cast').value,
+        status: document.getElementById('m-status').value
+      };
+      if (id) {
+        const idx = movies.findIndex(m => m.id === id);
+        if (idx !== -1) movies[idx] = { ...movies[idx], ...data };
+      } else {
+        data.id = 'm' + Date.now();
+        movies.push(data);
+      }
+      localStorage.setItem('movies', JSON.stringify(movies));
+      modal.classList.remove('active');
+      renderMoviesTable();
+    });
+  </script>
+</body>
+</html>

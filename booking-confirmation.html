@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineNova | Booking Confirmed</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar scrolled">
+    <div class="container">
+      <a href="index.html" class="logo"><div class="logo-icon">🎬</div>Cine<span>Nova</span></a>
+      <a href="my-bookings.html" class="btn btn-primary btn-sm">My Bookings</a>
+    </div>
+  </nav>
+
+  <div class="confirm-wrap fade-up">
+    <div class="confirm-icon">✅</div>
+    <h2 style="font-size:1.8rem; font-weight:800; margin-bottom:8px;">Booking Confirmed!</h2>
+    <p class="text-muted">Your tickets have been booked successfully. Enjoy the show!</p>
+
+    <div class="ticket-card mt-4">
+      <div class="ticket-head">
+        <div style="font-size:0.75rem; letter-spacing:2px; opacity:0.7; margin-bottom:4px;">CINENOVA · YOUR TICKET</div>
+        <h3 id="t-movie">Movie Title</h3>
+        <div style="font-size:0.85rem; opacity:0.85; margin-top:4px;" id="t-genre">Genre</div>
+      </div>
+
+      <div class="ticket-perforation">
+        <div class="perf-circle"></div>
+        <div class="perf-line"></div>
+        <div class="perf-circle"></div>
+      </div>
+
+      <div class="ticket-body">
+        <div class="ticket-grid">
+          <div>
+            <div class="ticket-field-label">Booking ID</div>
+            <div class="ticket-field-value" id="t-id">—</div>
+          </div>
+          <div>
+            <div class="ticket-field-label">Date</div>
+            <div class="ticket-field-value" id="t-date">—</div>
+          </div>
+          <div>
+            <div class="ticket-field-label">Show Time</div>
+            <div class="ticket-field-value" id="t-time">—</div>
+          </div>
+          <div>
+            <div class="ticket-field-label">Seats</div>
+            <div class="ticket-field-value" id="t-seats" style="color:#e50914;">—</div>
+          </div>
+          <div style="grid-column: span 2;">
+            <div class="ticket-field-label">Theatre</div>
+            <div class="ticket-field-value" id="t-theatre">—</div>
+          </div>
+        </div>
+
+        <div style="border-top: 2px dashed #e5e7eb; margin: 20px 0;"></div>
+
+        <div style="text-align:center;">
+          <div class="ticket-barcode" id="t-barcode">|||||||||||||||</div>
+          <div class="ticket-id" id="t-id-bar">SCAN AT ENTRY</div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:16px; border-top:1px solid #f3f4f6;">
+          <div>
+            <div class="ticket-field-label">Total Paid</div>
+            <div style="font-size:1.4rem; font-weight:800; color:#e50914;" id="t-amount">—</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="ticket-field-label">Status</div>
+            <div style="color:#10b981; font-weight:700; font-size:0.9rem;">✅ CONFIRMED</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:28px;">
+      <a href="index.html" class="btn btn-ghost">← Home</a>
+      <a href="my-bookings.html" class="btn btn-ghost">My Bookings</a>
+      <button class="btn btn-primary" onclick="window.print()">🖨 Print Ticket</button>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    const id = new URLSearchParams(window.location.search).get('id');
+    const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+    const movies = JSON.parse(localStorage.getItem('movies'));
+    const theatres = JSON.parse(localStorage.getItem('theatres'));
+    const b = bookings.find(x => x.bookingId === id);
+
+    if (!b) { document.body.innerHTML = '<div style="text-align:center;padding:10rem"><h2>Booking not found</h2><a href="index.html">Go Home</a></div>'; }
+    else {
+      const movie = movies.find(m => m.id === b.movieId);
+      const theatre = theatres.find(t => t.id === b.theatreId);
+
+      document.getElementById('t-movie').textContent = movie.title;
+      document.getElementById('t-genre').textContent = movie.genre;
+      document.getElementById('t-id').textContent = b.bookingId;
+      document.getElementById('t-date').textContent = b.date;
+      document.getElementById('t-time').textContent = b.time;
+      document.getElementById('t-seats').textContent = b.seats.join(', ');
+      document.getElementById('t-theatre').textContent = theatre.name;
+      document.getElementById('t-barcode').textContent = b.bookingId.split('').join(' ');
+      document.getElementById('t-id-bar').textContent = b.bookingId + ' · SCAN AT ENTRY';
+      document.getElementById('t-amount').textContent = `₹${b.totalAmount.toLocaleString('en-IN')}`;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineNova | Book Movie Tickets Online</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">🎬</div>
+        Cine<span>Nova</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" class="active">Home</a>
+        <a href="#now-showing">Movies</a>
+        <a href="#upcoming">Upcoming</a>
+      </div>
+      <div class="nav-actions" id="nav-actions">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SLIDER -->
+  <section class="hero" id="hero">
+    <div class="hero-bg" id="hero-bg"></div>
+    <div class="hero-gradient"></div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge fade-up">🔴 Now Showing</div>
+        <h1 class="hero-title fade-up-1" id="hero-title">—</h1>
+        <div class="hero-meta fade-up-2" id="hero-meta"></div>
+        <p class="hero-desc fade-up-2" id="hero-desc">—</p>
+        <p class="hero-quote fade-up-2">Your seat is waiting. The movie is about to begin.</p>
+        <div class="hero-actions fade-up-3">
+          <a href="#" class="btn btn-primary btn-lg glow-pulse" id="hero-book-btn">🎟 Book Tickets</a>
+          <a href="#now-showing" class="btn btn-ghost btn-lg">Explore All Movies</a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-dots" id="hero-dots"></div>
+  </section>
+
+  <!-- SEARCH + FILTERS -->
+  <div class="search-section">
+    <div class="container" style="display:flex; gap:20px; align-items:center; flex-wrap:wrap;">
+      <div class="search-wrapper" style="flex:1; min-width:220px;">
+        <span class="search-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </span>
+        <input type="text" class="search-input" id="search-input" placeholder="Search movies, genres…">
+      </div>
+      <div class="genre-filters" id="genre-filters"></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="container">
+    <div class="stats-banner mt-5">
+      <div class="stat-item"><span class="stat-number" id="stat-movies">0</span><div class="stat-label">Movies Available</div></div>
+      <div class="stat-item"><span class="stat-number">4</span><div class="stat-label">Premium Theatres</div></div>
+      <div class="stat-item"><span class="stat-number">5</span><div class="stat-label">Daily Shows</div></div>
+      <div class="stat-item"><span class="stat-number">HD</span><div class="stat-label">IMAX Experience</div></div>
+    </div>
+  </div>
+
+  <!-- NOW SHOWING -->
+  <section class="section container" id="now-showing">
+    <div class="section-header">
+      <h2 class="section-title">Now Showing</h2>
+      <a href="#" class="section-link">View all →</a>
+    </div>
+    <div class="movies-grid" id="now-showing-grid"></div>
+  </section>
+
+  <!-- UPCOMING -->
+  <section class="section container" id="upcoming" style="padding-top:0;">
+    <div class="section-header">
+      <h2 class="section-title">Coming Soon</h2>
+      <a href="#" class="section-link">View all →</a>
+    </div>
+    <div class="movies-grid" id="upcoming-grid"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo logo" style="font-size:1.4rem; margin-bottom:12px;">🎬 Cine<span>Nova</span></div>
+          <p class="footer-desc">Your premier destination for movie ticket booking. Enjoy the best cinema experience with CineNova — from seat selection to confirmation in minutes.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <a href="index.html">Home</a>
+          <a href="my-bookings.html">My Bookings</a>
+          <a href="login.html">Login</a>
+          <a href="register.html">Register</a>
+        </div>
+        <div class="footer-col">
+          <h4>Theatres</h4>
+          <a href="#">Apsara & Sudha Cinemas</a>
+          <a href="#">PVR InOrbit Mall</a>
+          <a href="#">Laxmi Citypride Multiplex</a>
+          <a href="#">Grand Theater Premium</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CineNova Booking System · Software Engineering Project · All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script>
+    // ── NAV ACTIONS ──
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const navActions = document.getElementById('nav-actions');
+    if (currentUser) {
+      navActions.innerHTML = `
+        <a href="my-bookings.html" class="btn btn-ghost btn-sm">My Bookings</a>
+        ${currentUser.role === 'admin' ? '<a href="admin-dashboard.html" class="btn btn-ghost btn-sm">Admin</a>' : ''}
+        <button onclick="logout()" class="btn btn-primary btn-sm">Logout</button>
+      `;
+    } else {
+      navActions.innerHTML = `
+        <a href="login.html" class="btn btn-ghost btn-sm">Login</a>
+        <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+      `;
+    }
+    function logout() {
+      localStorage.removeItem('currentUser');
+      location.reload();
+    }
+
+    // ── NAVBAR SCROLL ──
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // ── MOVIES ──
+    const movies = JSON.parse(localStorage.getItem('movies')) || [];
+    const nowShowing = movies.filter(m => m.status === 'now_showing');
+    const upcoming = movies.filter(m => m.status === 'upcoming');
+    document.getElementById('stat-movies').textContent = movies.length;
+
+    // ── HERO SLIDER ──
+    let heroIndex = 0;
+    const heroMovies = nowShowing.slice(0, 5);
+    const dotsEl = document.getElementById('hero-dots');
+    heroMovies.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => setHero(i));
+      dotsEl.appendChild(dot);
+    });
+    function setHero(i) {
+      heroIndex = i;
+      const m = heroMovies[i];
+      const bg = document.getElementById('hero-bg');
+      bg.style.backgroundImage = `url('${m.banner}')`;
+      bg.className = 'hero-bg';
+      requestAnimationFrame(() => { bg.classList.add('active'); });
+      document.getElementById('hero-title').textContent = m.title;
+      document.getElementById('hero-desc').textContent = m.synopsis;
+      document.getElementById('hero-meta').innerHTML = `
+        <span class="hero-rating">⭐ ${m.rating}/10</span>
+        <span>⏱ ${m.duration}</span>
+        <span>🎭 ${m.genre.split(',')[0]}</span>
+        <span>🌐 ${m.language}</span>
+      `;
+      document.getElementById('hero-book-btn').href = `movie-details.html?id=${m.id}`;
+      document.querySelectorAll('.hero-dot').forEach((d, j) => d.classList.toggle('active', j === i));
+    }
+    if (heroMovies.length) setHero(0);
+    const sliderInterval = setInterval(() => setHero((heroIndex + 1) % heroMovies.length), 6000);
+
+    // ── GENRE FILTERS ──
+    const genres = ['All', ...new Set(movies.flatMap(m => m.genre.split(',').map(g => g.trim())))];
+    const filtersEl = document.getElementById('genre-filters');
+    let activeGenre = 'All';
+    genres.forEach(g => {
+      const btn = document.createElement('button');
+      btn.className = 'genre-pill' + (g === 'All' ? ' active' : '');
+      btn.textContent = g;
+      btn.addEventListener('click', () => {
+        activeGenre = g;
+        document.querySelectorAll('.genre-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        renderMovies(document.getElementById('search-input').value);
+      });
+      filtersEl.appendChild(btn);
+    });
+
+    // ── RENDER MOVIES ──
+    function movieCard(m) {
+      const badge = m.status === 'now_showing'
+        ? `<div class="movie-badge badge-live">● Live</div>`
+        : `<div class="movie-badge badge-soon">Soon</div>`;
+      const actionBtn = m.status === 'now_showing'
+        ? `<a href="movie-details.html?id=${m.id}" class="card-book-btn">🎟 Book Now</a>`
+        : `<button class="card-book-btn" style="background:#374151; cursor:default;">Coming Soon</button>`;
+      return `
+        <div class="movie-card fade-up">
+          <div class="movie-poster-wrap">
+            ${badge}
+            <div class="movie-rating-badge">⭐ ${m.rating}</div>
+            <img src="${m.poster}" alt="${m.title}" class="movie-poster" loading="lazy"
+              onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=600'">
+            <div class="movie-poster-overlay">
+              ${actionBtn}
+              <div class="card-tags">
+                ${m.genre.split(',').slice(0,2).map(g => `<span class="card-tag">${g.trim()}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+          <div class="movie-card-info">
+            <div class="card-title">${m.title}</div>
+            <div class="card-meta">
+              <span class="card-genre">${m.genre.split(',')[0]}</span>
+              <span class="card-lang">${m.language}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMovies(searchTerm = '') {
+      const q = searchTerm.toLowerCase();
+      const filtered = movies.filter(m => {
+        const matchSearch = !q || m.title.toLowerCase().includes(q) || m.genre.toLowerCase().includes(q);
+        const matchGenre = activeGenre === 'All' || m.genre.toLowerCase().includes(activeGenre.toLowerCase());
+        return matchSearch && matchGenre;
+      });
+
+      const nowGrid = document.getElementById('now-showing-grid');
+      const upGrid = document.getElementById('upcoming-grid');
+      const ns = filtered.filter(m => m.status === 'now_showing');
+      const up = filtered.filter(m => m.status === 'upcoming');
+
+      nowGrid.innerHTML = ns.length ? ns.map(movieCard).join('') : `<div class="empty-state" style="grid-column:1/-1"><p>No movies found.</p></div>`;
+      upGrid.innerHTML = up.length ? up.map(movieCard).join('') : `<div class="empty-state" style="grid-column:1/-1"><p>No upcoming movies found.</p></div>`;
+    }
+
+    renderMovies();
+
+    document.getElementById('search-input').addEventListener('input', e => renderMovies(e.target.value));
+  </script>
+</body>
+</html>

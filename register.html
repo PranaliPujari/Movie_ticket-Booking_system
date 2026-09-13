@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineNova | Register</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { overflow: hidden; }
+    .login-page {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+    }
+    /* LEFT — cinematic poster panel */
+    .login-poster {
+      position: relative;
+      overflow: hidden;
+      background: #0b0b0e;
+    }
+    .login-poster-bg {
+      position: absolute; inset: 0;
+      background: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=900') center/cover no-repeat;
+      opacity: 0.5;
+      transform: scale(1.04);
+      animation: slowZoom 12s ease infinite alternate;
+    }
+    @keyframes slowZoom { from { transform: scale(1); } to { transform: scale(1.06); } }
+    .login-poster-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(6,8,16,0.85) 0%, rgba(229,9,20,0.12) 100%);
+    }
+    .login-poster-content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px;
+    }
+    .poster-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: white;
+    }
+    .poster-logo span { color: var(--primary); }
+    .poster-logo-icon {
+      width: 34px; height: 34px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .poster-tagline {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      line-height: 1.1;
+      color: white;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      margin-bottom: 16px;
+    }
+    .poster-tagline span { color: var(--primary); }
+    .poster-sub {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+    .poster-features {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .poster-feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255,255,255,0.75);
+      font-size: 0.9rem;
+    }
+    .feature-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(229,9,20,0.2);
+      border: 1px solid rgba(229,9,20,0.5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    /* RIGHT — form panel */
+    .login-form-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: var(--bg-secondary);
+      overflow-y: auto;
+    }
+    .login-form-box {
+      width: 100%;
+      max-width: 380px;
+    }
+    .login-form-box h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .login-form-box .sub {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      margin-bottom: 32px;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: var(--text-faint);
+      font-size: 0.8rem;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    @media (max-width: 768px) {
+      body { overflow: auto; }
+      .login-page { grid-template-columns: 1fr; }
+      .login-poster { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-page">
+    <!-- LEFT: Cinematic Panel -->
+    <div class="login-poster">
+      <div class="login-poster-bg"></div>
+      <div class="login-poster-overlay"></div>
+      <div class="login-poster-content">
+        <div class="poster-logo">
+          <div class="poster-logo-icon">🎬</div>
+          Cine<span>Nova</span>
+        </div>
+        <div>
+          <div class="poster-tagline">
+            Join the Movie<br><span>Revolution.</span>
+          </div>
+          <p class="poster-sub">Create your CineNova account in seconds. Unlock fast booking, exclusive seats, and ticket history.</p>
+          <div class="poster-features">
+            <div class="poster-feature"><div class="feature-dot">🎟</div>Instant seat reservation</div>
+            <div class="poster-feature"><div class="feature-dot">⭐</div>Exclusive movie recommendations</div>
+            <div class="poster-feature"><div class="feature-dot">📱</div>Digital QR tickets</div>
+            <div class="poster-feature"><div class="feature-dot">🔒</div>Secure 100% payments</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Form Panel -->
+    <div class="login-form-panel">
+      <div class="login-form-box fade-up">
+        <h2>Create Account 🍿</h2>
+        <p class="sub">Join CineNova for the best cinema experience</p>
+
+        <form id="register-form">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="John Doe" required autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Create a strong password" required>
+          </div>
+          <button type="submit" class="form-submit" id="reg-btn">Create Account →</button>
+        </form>
+
+        <div class="divider">or</div>
+
+        <div class="auth-switch" style="margin-top:0;">
+          Already have an account? <a href="login.html">Login here →</a>
+        </div>
+        <div class="auth-switch mt-2">
+          <a href="index.html" style="color:var(--text-faint); font-size:0.8rem;">← Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" style="
+    position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(100px);
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:14px 24px; display:flex; align-items:center; gap:12px;
+    font-size:0.9rem; font-weight:600; z-index:9999;
+    box-shadow:0 8px 30px rgba(0,0,0,0.5);
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+    opacity:0; white-space:nowrap;">
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    function showToast(msg, type='error') {
+      const t = document.getElementById('toast');
+      t.innerHTML = (type==='success' ? '✅ ' : '❌ ') + msg;
+      t.style.borderColor = type==='success' ? 'rgba(16,185,129,0.4)' : 'rgba(229,9,20,0.4)';
+      t.style.opacity = '1';
+      t.style.transform = 'translateX(-50%) translateY(0)';
+      setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(100px)'; }, 3000);
+    }
+
+    document.getElementById('register-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const btn = document.getElementById('reg-btn');
+      btn.textContent = 'Creating account…';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        
+        if (users.find(u => u.email === email)) {
+          showToast('Email address is already registered.');
+          btn.textContent = 'Create Account →';
+          btn.disabled = false;
+          return;
+        }
+
+        const newUser = { email, password, name, role: 'user' };
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('currentUser', JSON.stringify({ email: newUser.email, name: newUser.name, role: newUser.role }));
+        
+        showToast('Account created! Redirecting…', 'success');
+        setTimeout(() => {
+          if (sessionStorage.getItem('currentBooking')) {
+            window.location.href = 'booking-summary.html';
+          } else {
+            window.location.href = 'index.html';
+          }
+        }, 1000);
+      }, 600);
+    });
+  </script>
+</body>
+</html>

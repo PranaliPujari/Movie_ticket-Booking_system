@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineNova | My Bookings</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar scrolled">
+    <div class="container">
+      <a href="index.html" class="logo"><div class="logo-icon">🎬</div>Cine<span>Nova</span></a>
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-ghost btn-sm">Browse Movies</a>
+        <button onclick="logout()" class="btn btn-primary btn-sm">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="bookings-page">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">My Bookings</h2>
+        <a href="index.html" class="btn btn-primary btn-sm">+ New Booking</a>
+      </div>
+      <div id="bookings-container"></div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    function logout() { localStorage.removeItem('currentUser'); window.location.href = 'index.html'; }
+
+    const cu = JSON.parse(localStorage.getItem('currentUser'));
+    if (!cu) { window.location.href = 'login.html'; }
+
+    const bookings = (JSON.parse(localStorage.getItem('bookings')) || []).filter(b => b.userEmail === cu.email).reverse();
+    const movies = JSON.parse(localStorage.getItem('movies'));
+    const theatres = JSON.parse(localStorage.getItem('theatres'));
+    const container = document.getElementById('bookings-container');
+
+    if (!bookings.length) {
+      container.innerHTML = `<div class="empty-state"><div style="font-size:4rem; margin-bottom:16px;">🎬</div><h3>No bookings yet</h3><p>Book your first movie ticket today!</p><a href="index.html" class="btn btn-primary mt-4">Browse Movies</a></div>`;
+    } else {
+      bookings.forEach(b => {
+        const movie = movies.find(m => m.id === b.movieId);
+        const theatre = theatres.find(t => t.id === b.theatreId);
+        container.innerHTML += `
+          <div class="booking-item fade-up">
+            <img src="${movie ? movie.poster : ''}" alt="${movie ? movie.title : ''}" class="booking-item-poster"
+              onerror="this.style.display='none'">
+            <div class="booking-item-info">
+              <div class="booking-item-title">${movie ? movie.title : 'Unknown Movie'}</div>
+              <div class="booking-item-meta">🏟 ${theatre ? theatre.name : 'Unknown'}</div>
+              <div class="booking-item-meta">📅 ${b.date} &nbsp;·&nbsp; ⏰ ${b.time}</div>
+              <div class="booking-item-meta" style="margin-top:4px;">💺 ${b.seats.join(', ')}</div>
+            </div>
+            <div class="booking-item-right">
+              <div class="status-chip">✅ ${b.status}</div>
+              <div class="booking-amount">₹${b.totalAmount.toLocaleString('en-IN')}</div>
+              <a href="booking-confirmation.html?id=${b.bookingId}" class="btn btn-ghost btn-sm">View Ticket</a>
+            </div>
+          </div>
+        `;
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineNova | Movie Details</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar scrolled" id="navbar">
+    <div class="container">
+      <a href="index.html" class="logo"><div class="logo-icon">🎬</div>Cine<span>Nova</span></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#now-showing">Movies</a>
+      </div>
+      <div class="nav-actions" id="nav-actions"></div>
+    </div>
+  </nav>
+
+  <div class="details-hero-wrap">
+    <img id="banner-img" src="" alt="" class="details-hero-bg">
+    <div class="details-hero-overlay"></div>
+  </div>
+
+  <div class="details-main container">
+    <div class="details-layout">
+      <div>
+        <img id="poster-img" src="" alt="" class="details-poster-img">
+      </div>
+      <div class="details-info fade-up">
+        <h1 class="details-title" id="movie-title">—</h1>
+        <div class="details-meta" id="movie-meta"></div>
+        <p class="details-synopsis" id="movie-synopsis">—</p>
+        <p style="font-size:0.85rem; color:var(--text-dim);"><strong style="color:var(--text);">Cast:</strong> <span id="movie-cast">—</span></p>
+
+        <div class="booking-box mt-4">
+          <h3>🎟 Book Your Tickets</h3>
+          <form id="booking-form">
+            <div class="booking-grid">
+              <div class="form-group">
+                <label>Theatre</label>
+                <select id="theatre" required></select>
+              </div>
+              <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="date" required>
+              </div>
+              <div class="form-group">
+                <label>Show Time</label>
+                <select id="showTime" required></select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:8px; padding:12px 28px; font-size:1rem;">
+              Select Seats →
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-bottom">&copy; 2026 CineNova Booking System · All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script>
+    // Nav
+    const cu = JSON.parse(localStorage.getItem('currentUser'));
+    document.getElementById('nav-actions').innerHTML = cu
+      ? `<a href="my-bookings.html" class="btn btn-ghost btn-sm">My Bookings</a><button onclick="(()=>{localStorage.removeItem('currentUser');location.href='index.html';})()" class="btn btn-primary btn-sm">Logout</button>`
+      : `<a href="login.html" class="btn btn-ghost btn-sm">Login</a><a href="register.html" class="btn btn-primary btn-sm">Register</a>`;
+
+    const id = new URLSearchParams(window.location.search).get('id');
+    const movies = JSON.parse(localStorage.getItem('movies'));
+    const theatres = JSON.parse(localStorage.getItem('theatres'));
+    const shows = JSON.parse(localStorage.getItem('shows'));
+    const movie = movies.find(m => m.id === id);
+
+    if (!movie) { document.body.innerHTML = '<div style="text-align:center;padding:10rem;"><h2>Movie not found</h2><a href="index.html" class="btn btn-primary mt-4">Go Home</a></div>'; }
+    else {
+      document.title = `CineNova | ${movie.title}`;
+      document.getElementById('banner-img').src = movie.banner;
+      document.getElementById('poster-img').src = movie.poster;
+      document.getElementById('movie-title').textContent = movie.title;
+      document.getElementById('movie-synopsis').textContent = movie.synopsis;
+      document.getElementById('movie-cast').textContent = movie.cast;
+      document.getElementById('movie-meta').innerHTML = `
+        <span class="meta-chip rating">⭐ ${movie.rating}/10</span>
+        <span class="meta-chip">⏱ ${movie.duration}</span>
+        <span class="meta-chip">🎭 ${movie.genre}</span>
+        <span class="meta-chip">🌐 ${movie.language}</span>
+      `;
+
+      const theatreSelect = document.getElementById('theatre');
+      theatres.forEach(t => {
+        theatreSelect.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+      });
+
+      const showSelect = document.getElementById('showTime');
+      shows.forEach(s => {
+        showSelect.innerHTML += `<option value="${s}">${s}</option>`;
+      });
+
+      const dateInput = document.getElementById('date');
+      const today = new Date().toISOString().split('T')[0];
+      dateInput.min = today;
+      dateInput.value = today;
+
+      document.getElementById('booking-form').addEventListener('submit', e => {
+        e.preventDefault();
+        sessionStorage.setItem('currentBooking', JSON.stringify({
+          movieId: movie.id,
+          theatreId: theatreSelect.value,
+          date: dateInput.value,
+          time: showSelect.value
+        }));
+        window.location.href = 'seat-selection.html';
+      });
+    }
+  </script>
+</body>
+</html>
